@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import crypto from 'crypto';
+import CryptoJS from 'crypto-js';
 
 // Access the secret key from environment variables
 const SECRET_KEY = import.meta.env.VITE_APP_COOKIE_SECRET_KEY as string;
@@ -11,16 +11,11 @@ const SECRET_KEY = import.meta.env.VITE_APP_COOKIE_SECRET_KEY as string;
  * @param {number} expires - Time in days until the cookie expires.
  */
 export const cookieStore = (name: string, value: any, expires: number = 1) => {
-    const key = crypto.createHash('sha256').update(String(SECRET_KEY)).digest('base64').substr(0, 32);
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
-  
-    let encryptedValue = cipher.update(JSON.stringify(value), 'utf8', 'hex');
-    encryptedValue += cipher.final('hex');
-    const encryptedData = iv.toString('hex') + encryptedValue;
-  
-    // Store the encrypted value in the cookie with expiration
-    Cookies.set(name, encryptedData, { expires });
+  // Encrypt the value using AES-256
+  const encryptedValue = CryptoJS.AES.encrypt(JSON.stringify(value), SECRET_KEY).toString();
+
+  // Store the encrypted value in the cookie with expiration
+  Cookies.set(name, encryptedValue, { expires });
 };
 
 /**
@@ -29,27 +24,24 @@ export const cookieStore = (name: string, value: any, expires: number = 1) => {
  * @returns {any | null} - The decrypted value, or null if decryption fails.
  */
 export const cookieGet = (name: string): any | null => {
-    const encryptedData = Cookies.get(name);
+  // Get the encrypted value from the cookie
+  const encryptedValue = Cookies.get(name);
 
-    if (encryptedData) {
-      try {
-        const key = crypto.createHash('sha256').update(String(SECRET_KEY)).digest('base64').substr(0, 32);
-        const iv = Buffer.from(encryptedData.substring(0, 32), 'hex');
-        const encryptedText = encryptedData.substring(32);
-        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
-  
-        let decryptedValue = decipher.update(encryptedText, 'hex', 'utf8');
-        decryptedValue += decipher.final('utf8');
-  
-        // Parse and return the original value
-        return JSON.parse(decryptedValue);
-      } catch (error) {
-        console.error('Error decrypting cookie:', error);
-        return null;
-      }
+  if (encryptedValue) {
+    try {
+      // Decrypt the cookie value using AES-256
+      const bytes = CryptoJS.AES.decrypt(encryptedValue, SECRET_KEY);
+      const decryptedValue = bytes.toString(CryptoJS.enc.Utf8);
+
+      // Parse and return the original value
+      return JSON.parse(decryptedValue);
+    } catch (error) {
+      console.error('Error decrypting cookie:', error);
+      return null;
     }
-  
-    return null; // Return null if the cookie doesn't exist or decryption fails
+  }
+
+  return null; // Return null if the cookie doesn't exist or decryption fails
 };
 
 /**
