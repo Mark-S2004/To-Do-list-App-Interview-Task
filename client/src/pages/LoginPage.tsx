@@ -84,7 +84,7 @@ export default function LoginPage(props) {
     try {
       await loginData({ email, password }).unwrap()
     } catch (error) {
-      toast.error("An error occurred while log.")
+      toast.error(`An error occurred.\n${error.data.message} [${error.status}]`)
     }
   }
 
