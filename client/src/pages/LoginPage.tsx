@@ -1,9 +1,7 @@
 import * as React from "react"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Checkbox from "@mui/material/Checkbox"
 import CssBaseline from "@mui/material/CssBaseline"
-import FormControlLabel from "@mui/material/FormControlLabel"
 import Divider from "@mui/material/Divider"
 import FormLabel from "@mui/material/FormLabel"
 import FormControl from "@mui/material/FormControl"
@@ -15,6 +13,12 @@ import MuiCard from "@mui/material/Card"
 import { styled } from "@mui/material/styles"
 import AppTheme from "@components/shared-theme/AppTheme"
 import ColorModeSelect from "@components/shared-theme/ColorModeSelect"
+import { ToastContainer, toast } from "react-toastify"
+
+import { useLoginUserMutation } from "@/api/authApi"
+import { useNavigate } from "react-router"
+import { FormEvent, useEffect } from "react"
+import { cookieStore } from "@/utils/cookieHash"
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -59,30 +63,38 @@ const LoginPageContainer = styled(Stack)(({ theme }) => ({
 }))
 
 export default function LoginPage(props) {
+  const navigate = useNavigate()
+  const [loginData, { data: responseData, isSuccess }] = useLoginUserMutation()
+
   const [emailError, setEmailError] = React.useState(false)
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("")
   const [passwordError, setPasswordError] = React.useState(false)
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("")
 
-  const handleSubmit = (event) => {
+  const emailPattern = /\S+@\S+\.\S+/
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     if (emailError || passwordError) {
-      event.preventDefault()
       return
     }
     const data = new FormData(event.currentTarget)
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    })
+    const email = data.get("email") as string
+    const password = data.get("password") as string
+    try {
+      await loginData({ email, password }).unwrap()
+    } catch (error) {
+      toast.error("An error occurred while log.")
+    }
   }
 
   const validateInputs = () => {
-    const email = document.getElementById("email")
-    const password = document.getElementById("password")
+    const email = document.getElementById("email") as HTMLInputElement
+    const password = document.getElementById("password") as HTMLInputElement
 
     let isValid = true
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+    if (!email!.value || !emailPattern.test(email!.value)) {
       setEmailError(true)
       setEmailErrorMessage("Please enter a valid email address.")
       isValid = false
@@ -91,7 +103,7 @@ export default function LoginPage(props) {
       setEmailErrorMessage("")
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password!.value || password!.value.length < 6) {
       setPasswordError(true)
       setPasswordErrorMessage("Password must be at least 6 characters long.")
       isValid = false
@@ -103,6 +115,15 @@ export default function LoginPage(props) {
     return isValid
   }
 
+  useEffect(() => {
+    if (responseData && isSuccess) {
+      const { token, data } = responseData
+      cookieStore("_id", data._id)
+      cookieStore("token", token)
+      navigate("/", { replace: true })
+    }
+  }, [responseData, isSuccess, navigate])
+
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
@@ -110,6 +131,7 @@ export default function LoginPage(props) {
         <ColorModeSelect
           sx={{ position: "fixed", top: "1rem", right: "1rem" }}
         />
+        <ToastContainer />
         <Card variant="outlined">
           <Typography
             component="h1"
