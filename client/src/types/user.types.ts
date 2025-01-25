@@ -15,7 +15,7 @@ export interface TokenData {
 }
 
 export interface IUser {
-    _id: string;
+    _id?: string;
     email: string;
     password: string;
     phone: string;

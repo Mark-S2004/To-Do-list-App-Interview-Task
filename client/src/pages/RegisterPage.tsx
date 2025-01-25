@@ -14,6 +14,11 @@ import MuiCard from "@mui/material/Card"
 import { styled } from "@mui/material/styles"
 import AppTheme from "@components/shared-theme/AppTheme"
 import ColorModeSelect from "@components/shared-theme/ColorModeSelect"
+import { ToastContainer, toast } from "react-toastify"
+
+import { useNavigate } from "react-router"
+import { useRegisterUserMutation } from "@/api/authApi"
+import { useEffect } from "react"
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -58,6 +63,8 @@ const RegisterContainer = styled(Stack)(({ theme }) => ({
 }))
 
 export default function RegisterPage(props: { disableCustomTheme?: boolean }) {
+  const navigate = useNavigate()
+
   const [emailError, setEmailError] = React.useState(false)
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("")
   const [passwordError, setPasswordError] = React.useState(false)
@@ -66,6 +73,8 @@ export default function RegisterPage(props: { disableCustomTheme?: boolean }) {
   const [nameErrorMessage, setNameErrorMessage] = React.useState("")
   const [phoneError, setPhoneError] = React.useState(false)
   const [phoneErrorMessage, setPhoneErrorMessage] = React.useState("")
+
+  const [registerData, { isSuccess }] = useRegisterUserMutation()
 
   const validateInputs = () => {
     const email = document.getElementById("email") as HTMLInputElement
@@ -117,25 +126,36 @@ export default function RegisterPage(props: { disableCustomTheme?: boolean }) {
     return isValid
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault()
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (nameError || emailError || passwordError || phoneError) {
       return
     }
     const data = new FormData(event.currentTarget)
-    console.log({
-      name: data.get("name"),
-      lastName: data.get("lastName"),
-      email: data.get("email"),
-      password: data.get("password"),
-    })
+    const name = data.get("name") as string
+    const phone = data.get("phone") as string
+    const email = data.get("email") as string
+    const password = data.get("password") as string
+
+    try {
+      await registerData({ email, password, phone, name }).unwrap()
+    } catch (error) {
+      toast.error(`An error occurred.\n${error.data.message} [${error.status}]`)
+    }
   }
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/auth/login")
+    }
+  }, [isSuccess, registerData, navigate])
 
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
       <ColorModeSelect sx={{ position: "fixed", top: "1rem", right: "1rem" }} />
       <RegisterContainer direction="column" justifyContent="space-between">
+        <ToastContainer />
         <Card variant="outlined">
           <Typography
             component="h1"
