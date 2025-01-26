@@ -17,9 +17,13 @@ class TaskService {
       throw new HttpException(409, `This user does not exist`);
     }
 
-    const userData: User = await this.users.findByIdAndUpdate(userId, {
-      $push: { todoList: taskData },
-    });
+    const userData: User = await this.users.findByIdAndUpdate(
+      userId,
+      {
+        $push: { todoList: taskData },
+      },
+      { new: true },
+    );
 
     return userData;
   }
@@ -38,6 +42,7 @@ class TaskService {
           'todoList.$.dueDate': taskData.dueDate,
         },
       },
+      { new: true },
     );
 
     if (!updatedTaskUser) {
@@ -48,9 +53,13 @@ class TaskService {
   }
 
   public async deleteTask(userId: string, taskId: string): Promise<User> {
-    const deletedTaskUser: User = await this.users.findByIdAndUpdate(userId, {
-      $pull: { todoList: { _id: taskId } },
-    });
+    const deletedTaskUser: User = await this.users.findByIdAndUpdate(
+      userId,
+      {
+        $pull: { todoList: { _id: taskId } },
+      },
+      { new: true },
+    );
     if (!deletedTaskUser) {
       throw new HttpException(409, "User doesn't exist");
     }
