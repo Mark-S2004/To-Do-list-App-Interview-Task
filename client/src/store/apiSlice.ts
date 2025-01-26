@@ -1,11 +1,11 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { API_BASE_URL } from '@/config';
-import { cookieGet } from '@/utils/cookieHash';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { API_BASE_URL } from "@/config"
+import { cookieGet } from "@/utils/cookieHash"
 
-const token = cookieGet('token');
+const token = cookieGet("token")
 
 export const apiSlice = createApi({
-  reducerPath: 'apiSlice',
+  reducerPath: "apiSlice",
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
     headers: {
@@ -13,7 +13,5 @@ export const apiSlice = createApi({
     },
   }),
   endpoints: () => ({}),
-  tagTypes: [
-    'Auth',
-  ],
-});
+  tagTypes: ["Auth", "Task", "User"],
+})

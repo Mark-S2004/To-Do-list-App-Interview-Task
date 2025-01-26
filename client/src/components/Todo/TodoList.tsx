@@ -1,18 +1,16 @@
 import Container from "@mui/material/Container"
 import Typography from "@mui/material/Typography"
 import List from "@mui/material/List"
-
-import { ITodoItem } from "@/types/todo.types"
 import TodoItem from "./TodoItem"
 
-interface Iprops {
-  todoList: ITodoItem[]
-}
+import { selectTodoList } from "@/store/loggedUserSlice"
+import { useAppSelector } from "@/store"
 
-function TodoList({ todoList }: Iprops) {
+function TodoList() {
+  const todoList = useAppSelector(selectTodoList)
   return (
-    <Container maxWidth="md">
-      {!todoList.length ? (
+    <Container maxWidth={false}>
+      {!todoList?.length ? (
         <Typography variant="h6" color="error">
           No Tasks today Wohoo !
         </Typography>

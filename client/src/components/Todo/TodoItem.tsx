@@ -3,7 +3,6 @@ import ListItemButton from "@mui/material/ListItemButton"
 import ListItemIcon from "@mui/material/ListItemIcon"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction"
 import ListItemText from "@mui/material/ListItemText"
 import IconButton from "@mui/material/IconButton"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
@@ -30,7 +29,6 @@ function TodoItem({ item }: Iprops) {
 
   return (
     <ListItem
-      key={item.id}
       disablePadding
       secondaryAction={
         <Stack direction="row" spacing={2}>

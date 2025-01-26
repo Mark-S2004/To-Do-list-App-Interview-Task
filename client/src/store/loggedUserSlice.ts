@@ -25,4 +25,6 @@ const loggedUserSlice = createSlice({
 
 export const { setUser, logout } = loggedUserSlice.actions
 export const selectUserName = (state: RootState) => state.loggedUser.data?.name
+export const selectTodoList = (state: RootState) =>
+  state.loggedUser.data?.todoList
 export default loggedUserSlice.reducer
