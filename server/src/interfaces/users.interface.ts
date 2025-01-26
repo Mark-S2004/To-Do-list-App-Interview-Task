@@ -4,4 +4,13 @@ export interface User {
   password: string;
   phone: string;
   name: string;
+  todoList: TodoList;
 }
+
+export class TodoItem {
+  title: string;
+  description: string;
+  dueDate: Date;
+}
+
+export type TodoList = TodoItem[];
