@@ -15,6 +15,7 @@ In the same terminal run the client server.
 
 ```bash
 cd ./client/
+npm install
 npm run dev
 ```
 
@@ -24,6 +25,7 @@ Open a new terminal in the repository directory and run the backend server.
 
 ```bash
 cd ./server/
+npm install
 npm run dev
 ```
 
