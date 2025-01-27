@@ -1,17 +1,39 @@
 import { FormEvent } from "react"
+import { toast } from "react-toastify"
 
 import Box from "@mui/material/Box"
 import FormLabel from "@mui/material/FormLabel"
 import FormControl from "@mui/material/FormControl"
 import { Button, TextField } from "@mui/material"
-
 import Card from "@components/Card"
 
+import { useCreateTaskMutation } from "@/api/taskApi"
+import { cookieGet } from "@/utils/cookieHash"
+
 const TodoForm = () => {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const [createTask] = useCreateTaskMutation()
+  const userId = cookieGet("_id").toString()
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    event.currentTarget.reset()
+    const data = new FormData(event.currentTarget)
+    const title = data.get("title") as string
+    if (!title) {
+      return
+    }
+    const description = data.get("description") as string
+
+    try {
+      await createTask({
+        userId: userId,
+        taskData: { title, description, dueDate: new Date() },
+      }).unwrap()
+    } catch (error) {
+      toast.error(`An error occurred.\n${error.data.message} [${error.status}]`)
+    }
+    event.target.reset()
   }
+
   return (
     <Card variant="outlined">
       <Box

@@ -5,16 +5,19 @@ import { IUser } from "@/types/user.types"
 
 export const taskApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    CreateTask: builder.mutation<IUser, ITodoItem>({
-      query: (taskData) => ({
-        url: `/users/:userId/tasks/`,
+    CreateTask: builder.mutation<
+      { data: IUser; message: string },
+      { userId: string; taskData: ITodoItem }
+    >({
+      query: (query) => ({
+        url: `/users/${query.userId}/tasks/`,
         method: "POST",
-        body: taskData,
+        body: query.taskData,
       }),
       async onQueryStarted(_user, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled
-          dispatch(setUser(data))
+          dispatch(setUser(data.data))
         } catch (error) {
           console.log(`Error on UpdateTask api mutation: ${error}`)
         }
@@ -22,16 +25,19 @@ export const taskApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Task"],
     }),
 
-    UpdateTask: builder.mutation<IUser, ITodoItem>({
-      query: (taskData) => ({
-        url: `/users/:userId/tasks/:taskId`,
+    UpdateTask: builder.mutation<
+      { data: IUser; message: string },
+      { userId: string; taskId: string; taskData: ITodoItem }
+    >({
+      query: (query) => ({
+        url: `/users/${query.userId}/tasks/${query.taskId}`,
         method: "PUT",
-        body: taskData,
+        body: query.taskData,
       }),
       async onQueryStarted(_user, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled
-          dispatch(setUser(data))
+          dispatch(setUser(data.data))
         } catch (error) {
           console.log(`Error on UpdateTask api mutation: ${error}`)
         }
@@ -39,15 +45,18 @@ export const taskApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Task"],
     }),
 
-    DeleteTask: builder.mutation<IUser, void>({
-      query: () => ({
-        url: `/users/:userId/tasks/:taskId`,
+    DeleteTask: builder.mutation<
+      { data: IUser; message: string },
+      { userId: string; taskId: string }
+    >({
+      query: (query) => ({
+        url: `/users/${query.userId}/tasks/${query.taskId}`,
         method: "DELETE",
       }),
       async onQueryStarted(_user, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled
-          dispatch(setUser(data))
+          dispatch(setUser(data.data))
         } catch (error) {
           console.log(`Error on UpdateTask api mutation: ${error}`)
         }
