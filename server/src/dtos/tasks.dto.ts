@@ -10,7 +10,4 @@ export class CreateTaskDto {
   // TODO: Change IsString to IsDate
   @IsString()
   dueDate: Date | string;
-
-  @IsBoolean()
-  done: boolean;
 }

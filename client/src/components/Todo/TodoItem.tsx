@@ -37,7 +37,7 @@ function TodoItem({ item }: Iprops) {
   }
 
   const handleSaveEdit = async () => {
-    const { _id, ...taskData } = editedItem
+    const { _id, done, ...taskData } = editedItem
     await updateTask({ userId, taskId: item._id!, taskData })
     setIsEditMode(false)
   }
