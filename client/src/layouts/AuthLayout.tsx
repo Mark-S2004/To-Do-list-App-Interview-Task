@@ -4,7 +4,7 @@ import { Outlet } from "react-router"
 const AuthLayout = () => {
   return (
     <>
-      Welcome, Guest!
+      <h2>Welcome, Guest!</h2>
       <Outlet />
     </>
   )

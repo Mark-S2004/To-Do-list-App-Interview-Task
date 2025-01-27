@@ -23,7 +23,10 @@ const ErrorPage: React.FC = () => {
   const goBack = () => navigate(-1) // Navigate back in history
 
   return (
-    <div className="flex items-center justify-center h-screen text-2xl bg-gray-100">
+    <div
+      className="flex items-center justify-center h-screen text-2xl bg-gray-100"
+      style={{ flexGrow: 1 }}
+    >
       <motion.div
         className="text-center"
         variants={containerVariants}
