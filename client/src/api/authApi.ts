@@ -30,13 +30,21 @@ export const authApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Auth"],
     }),
 
-    logOutUser: builder.mutation<IUser, { email: string; token: string }>({
-      query: (body) => ({
+    logOutUser: builder.mutation<IUser, { user: IUser; token: string }>({
+      query: (req) => ({
         url: "/logout",
         method: "POST",
-        body: body.email,
-        headers: { Authorization: "Bearer " + body.token },
+        body: req.user,
+        headers: { Authorization: "Bearer " + req.token },
       }),
+      async onQueryStarted(_user, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled
+          dispatch(setUser(null))
+        } catch (error) {
+          console.log(`Error on loginUser api mutation: ${error}`)
+        }
+      },
       invalidatesTags: ["Auth"],
     }),
   }),
