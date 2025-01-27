@@ -4,13 +4,15 @@ export interface User {
   password: string;
   phone: string;
   name: string;
-  todoList: TodoList;
+  todoList: TodoItem[];
 }
 
 export class TodoItem {
+  _id: string;
   title: string;
   description: string;
   dueDate: Date;
+  done: boolean;
 }
 
 export type TodoList = TodoItem[];

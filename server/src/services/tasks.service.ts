@@ -52,6 +52,22 @@ class TaskService {
     return updatedTaskUser;
   }
 
+  public async toggleTask(userId: string, taskId: string): Promise<User> {
+    const toggledTaskUser = await this.users.findById(userId);
+
+    if (toggledTaskUser) {
+      const taskIndex = toggledTaskUser.todoList.findIndex(task => task._id.toString() === taskId);
+      if (taskIndex > -1) {
+        toggledTaskUser.todoList[taskIndex].done = !toggledTaskUser.todoList[taskIndex].done;
+        await toggledTaskUser.save();
+      }
+    } else {
+      throw new HttpException(409, "User doesn't exist");
+    }
+
+    return toggledTaskUser;
+  }
+
   public async deleteTask(userId: string, taskId: string): Promise<User> {
     const deletedTaskUser: User = await this.users.findByIdAndUpdate(
       userId,

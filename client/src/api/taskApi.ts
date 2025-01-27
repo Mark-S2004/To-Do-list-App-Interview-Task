@@ -45,6 +45,25 @@ export const taskApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Task"],
     }),
 
+    ToggleTask: builder.mutation<
+      { data: IUser; message: string },
+      { userId: string; taskId: string }
+    >({
+      query: (query) => ({
+        url: `/users/${query.userId}/tasks/${query.taskId}/toggle`,
+        method: "PUT",
+      }),
+      async onQueryStarted(_user, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled
+          dispatch(setUser(data.data))
+        } catch (error) {
+          console.log(`Error on UpdateTask api mutation: ${error}`)
+        }
+      },
+      invalidatesTags: ["Task"],
+    }),
+
     DeleteTask: builder.mutation<
       { data: IUser; message: string },
       { userId: string; taskId: string }
@@ -70,5 +89,6 @@ export const taskApi = apiSlice.injectEndpoints({
 export const {
   useCreateTaskMutation,
   useUpdateTaskMutation,
+  useToggleTaskMutation,
   useDeleteTaskMutation,
 } = taskApi

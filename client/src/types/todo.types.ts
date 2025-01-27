@@ -3,6 +3,7 @@ export interface ITodoItem {
   title: string
   description: string
   dueDate: Date
+  done: boolean
 }
 
 export type ITodoList = ITodoItem[]

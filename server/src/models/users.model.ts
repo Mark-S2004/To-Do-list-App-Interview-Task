@@ -7,6 +7,7 @@ const TodoItemSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   dueDate: { type: Date, required: true },
+  done: { type: Boolean, default: false },
 });
 
 const userSchema: Schema = new Schema({

@@ -6,12 +6,18 @@ import EditIcon from "@mui/icons-material/Edit"
 import ListItemText from "@mui/material/ListItemText"
 import IconButton from "@mui/material/IconButton"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
+import CancelIcon from "@mui/icons-material/Cancel"
+import SaveIcon from "@mui/icons-material/Save"
 import { Stack } from "@mui/material"
 import { TextField } from "@mui/material"
 
 import { useState } from "react"
 import { ITodoItem } from "@/types/todo.types"
-import { useDeleteTaskMutation, useUpdateTaskMutation } from "@/api/taskApi"
+import {
+  useDeleteTaskMutation,
+  useToggleTaskMutation,
+  useUpdateTaskMutation,
+} from "@/api/taskApi"
 import { cookieGet } from "@/utils/cookieHash"
 
 interface Iprops {
@@ -21,6 +27,7 @@ interface Iprops {
 function TodoItem({ item }: Iprops) {
   const [deleteTask] = useDeleteTaskMutation()
   const [updateTask] = useUpdateTaskMutation()
+  const [toggleTask] = useToggleTaskMutation()
   const userId = cookieGet("_id")
   const [isEditMode, setIsEditMode] = useState(false)
   const [editedItem, setEditedItem] = useState({ ...item })
@@ -39,8 +46,8 @@ function TodoItem({ item }: Iprops) {
     await deleteTask({ userId: userId, taskId: item._id! })
   }
 
-  const handleToggle = () => {
-    console.log(item)
+  const handleToggle = async () => {
+    await toggleTask({ userId, taskId: item._id! })
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +61,7 @@ function TodoItem({ item }: Iprops) {
         <Stack direction="row" spacing={2}>
           {isEditMode ? (
             <IconButton edge="end" aria-label="save" onClick={handleSaveEdit}>
-              <CheckCircleIcon color="primary" />
+              <SaveIcon color="primary" />
             </IconButton>
           ) : (
             <IconButton edge="end" aria-label="edit" onClick={handleEdit}>
@@ -88,11 +95,30 @@ function TodoItem({ item }: Iprops) {
           />
         </ListItemButton>
       ) : (
-        <ListItemButton role={undefined} onClick={() => {}} dense>
+        <ListItemButton role={undefined} onClick={handleToggle} dense>
           <ListItemIcon>
-            <CheckCircleIcon color="primary" />
+            {item.done ? (
+              <CancelIcon color="secondary" />
+            ) : (
+              <CheckCircleIcon color="primary" />
+            )}
           </ListItemIcon>
-          <ListItemText primary={item.title} secondary={item.description} />
+          <ListItemText
+            primary={
+              <span
+                style={{ textDecoration: item.done ? "line-through" : "none" }}
+              >
+                {item.title}
+              </span>
+            }
+            secondary={
+              <span
+                style={{ textDecoration: item.done ? "line-through" : "none" }}
+              >
+                {item.description}
+              </span>
+            }
+          />
         </ListItemButton>
       )}
     </ListItem>

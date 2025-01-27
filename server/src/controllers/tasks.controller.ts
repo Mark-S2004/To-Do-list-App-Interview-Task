@@ -36,6 +36,18 @@ class TasksController {
     }
   };
 
+  public toggleTask = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId: string = req.params.userId;
+      const taskId: string = req.params.taskId;
+      const toggledTaskUser: User = await this.taskService.toggleTask(userId, taskId);
+
+      res.status(200).json({ data: toggledTaskUser, message: 'deleted' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public deleteTask = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId: string = req.params.userId;
