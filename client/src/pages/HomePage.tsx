@@ -11,7 +11,9 @@ const Homepage = () => {
 
   return (
     <>
-      <header>Welcome {userName}</header>
+      <header>
+        <h2>Welcome {userName}</h2>
+      </header>
       <main>
         <TodoForm />
         <TodoList />
